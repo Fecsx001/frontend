@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bejelentkezés</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <style>
     :root {
-      --primary-color: #7AA88C; /* sötétebb, jó kontraszt */
+      --primary-color: #7AA88C;
       --primary-hover: #5F8A6B;
       --input-bg: rgba(232, 245, 233, 0.6);
       --error-color: #EF9A9A;
     }
 
-    /* Fade-in animáció */
     .fade-in {
       animation: fadeIn 0.6s ease forwards;
     }
+
     @keyframes fadeIn {
       0% { opacity: 0; transform: translateY(-10px); }
       100% { opacity: 1; transform: translateY(0); }
@@ -28,14 +30,18 @@
       cursor: pointer;
       transition: color 0.3s;
     }
-    .toggle-link:hover { color: var(--primary-hover); text-decoration: underline; }
+
+    .toggle-link:hover {
+      color: var(--primary-hover);
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body class="flex items-center justify-center min-h-screen font-sans bg-cover bg-center"
       style="background-image: url('resource/background_1_freepik.jpg');">
 
   <div class="bg-white/30 backdrop-blur-lg border border-white/40 rounded-3xl shadow-xl p-10 w-full max-w-md fade-in">
-    <h2 class="text-3xl font-semibold mb-6 text-center text-[var(--primary-color)]">Haló</h2>
+    <h2 class="text-3xl font-semibold mb-6 text-center text-[var(--primary-color)]">Bejelentkezés</h2>
 
     <form id="loginForm" class="space-y-5">
       <!-- Email -->
@@ -60,7 +66,7 @@
     </form>
 
     <p class="mt-4 text-sm text-gray-700 text-center">
-      Még nincs fiókod? 
+      Még nincs fiókod?
       <a href="registration.html" class="toggle-link">Regisztrálj</a>
     </p>
   </div>
@@ -78,29 +84,43 @@
       return re.test(email);
     }
 
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      let valid = true;
+    loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  let valid = true;
 
-      if(!validateEmail(loginEmail.value)){
-        loginEmailError.classList.remove('hidden');
-        valid = false;
-      } else {
-        loginEmailError.classList.add('hidden');
-      }
+  if (!validateEmail(loginEmail.value)) {
+    loginEmailError.classList.remove('hidden');
+    valid = false;
+  } else {
+    loginEmailError.classList.add('hidden');
+  }
 
-      if(!loginPassword.value){
-        loginPasswordError.classList.remove('hidden');
-        valid = false;
-      } else {
-        loginPasswordError.classList.add('hidden');
-      }
+  if (!loginPassword.value.trim()) {
+    loginPasswordError.classList.remove('hidden');
+    valid = false;
+  } else {
+    loginPasswordError.classList.add('hidden');
+  }
 
-      if(valid){
-        alert("Sikeres bejelentkezés!");
-        loginForm.reset();
-      }
-    });
+  if (valid) {
+    // 👇 Build the full JSON object from inputs
+    const userData = {
+      emal: loginEmail.value.trim(),
+      password: loginPassword.value
+    };
+    await axios.post('http://172.20.10.5:5000/login', userData);
+
+      console.log('Sikeres bejelentkezés:', response.data);
+      alert("✅ Sikeres bejelentkezés!");
+
+      loginForm.reset();
+
+      // Optional: redirect or store token
+      // localStorage.setItem("token", response.data.token);
+      // window.location.href = "dashboard.html";
+  }
+});
+
   </script>
 </body>
 </html>
